@@ -1,0 +1,61 @@
+# Local learning environment based on the official Dependency-Track quickstart.
+# Do not reuse the laboratory credentials in production.
+name: dependency-risk-lab
+
+services:
+  apiserver:
+    image: ghcr.io/dependencytrack/apiserver:5.2.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+    environment:
+      DT_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dtrack
+      DT_DATASOURCE_USERNAME: dtrack
+      DT_DATASOURCE_PASSWORD: ${DTRACK_DB_PASSWORD:?Copy .env.example to .env and set DTRACK_DB_PASSWORD}
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - apiserver-data:/data
+    restart: unless-stopped
+
+  trivy:
+    image: aquasec/trivy:0.76.1
+    command:
+      - server
+      - --listen
+      - :8080
+    volumes:
+      - trivy-cache:/root/.cache/trivy
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/dependencytrack/frontend:5.2.1
+    environment:
+      API_BASE_URL: http://localhost:8080
+    ports:
+      - "127.0.0.1:8081:8080"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: dtrack
+      POSTGRES_USER: dtrack
+      POSTGRES_PASSWORD: ${DTRACK_DB_PASSWORD:?Copy .env.example to .env and set DTRACK_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+volumes:
+  apiserver-data: {}
+  postgres-data: {}
+  trivy-cache: {}
+
