@@ -1,0 +1,7 @@
+# Updated dependency set used for the repeat scan.
+Django==6.1.2
+Jinja2==3.1.6
+PyYAML==6.0.3
+requests==2.34.2
+urllib3==2.8.0
+

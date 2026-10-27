@@ -1,0 +1,7 @@
+# Intentionally outdated packages for a non-executable SCA training case.
+Django==2.2.0
+Jinja2==2.10.1
+PyYAML==5.3.1
+requests==2.19.1
+urllib3==1.26.5
+
