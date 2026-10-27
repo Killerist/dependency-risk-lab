@@ -1,3 +1,4 @@
+
 # Dependency Risk Lab
 
 Воспроизводимый лабораторный кейс по контролю уязвимых зависимостей: от состава ПО до повторной проверки после исправлений.
@@ -87,8 +88,8 @@ docker compose up -d
 Скрипт запускает закреплённый образ Trivy и временно переименовывает выбранный набор зависимостей в стандартный `requirements.txt`, чтобы состояния не смешивались:
 
 ```bash
-./scripts/generate-trivy-sbom.sh before
-./scripts/generate-trivy-sbom.sh after
+bash ./scripts/generate-trivy-sbom.sh before
+bash ./scripts/generate-trivy-sbom.sh after
 ```
 
 Результаты:
@@ -102,8 +103,8 @@ docker compose up -d
 
 ```bash
 export DTRACK_API_KEY='replace-with-local-api-key'
-./scripts/upload-dtrack.sh before
-./scripts/upload-dtrack.sh after
+bash ./scripts/upload-dtrack.sh before
+bash ./scripts/upload-dtrack.sh after
 ```
 
 По умолчанию скрипт обращается к `http://localhost:8080`, создаёт проект `dependency-risk-lab` и использует `before` или `after` как версию. Параметры можно переопределить:
@@ -112,7 +113,7 @@ export DTRACK_API_KEY='replace-with-local-api-key'
 DTRACK_URL='https://dtrack.example.com' \
 DTRACK_PROJECT_NAME='demo-service' \
 DTRACK_PROJECT_VERSION='1.0.0' \
-./scripts/upload-dtrack.sh after
+bash ./scripts/upload-dtrack.sh after
 ```
 
 Обработка загруженного SBOM выполняется асинхронно. После импорта проверьте компоненты, findings, источник результата и статус анализа в интерфейсе Dependency-Track.
@@ -126,12 +127,12 @@ python3 -m venv .venv-tools
 source .venv-tools/bin/activate
 python -m pip install cyclonedx-bom pip-audit
 
-./scripts/generate-sbom.sh before
-./scripts/audit.sh before
+bash ./scripts/generate-sbom.sh before
+bash ./scripts/audit.sh before
 python scripts/triage_report.py evidence/audit-before.json reports/triage-before.md
 
-./scripts/generate-sbom.sh after
-FAIL_ON_FINDINGS=1 ./scripts/audit.sh after
+bash ./scripts/generate-sbom.sh after
+FAIL_ON_FINDINGS=1 bash ./scripts/audit.sh after
 python scripts/triage_report.py evidence/audit-after.json reports/triage-after.md
 python scripts/compare_results.py \
   evidence/audit-before.json \
