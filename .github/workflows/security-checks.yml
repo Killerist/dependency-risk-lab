@@ -1,0 +1,50 @@
+name: supply-chain-security
+
+on:
+  push:
+    paths:
+      - "demo-app/**"
+      - "scripts/**"
+      - ".github/workflows/security-checks.yml"
+  workflow_dispatch:
+
+jobs:
+  sbom-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install analysis tools
+        run: python -m pip install cyclonedx-bom pip-audit
+      - name: Generate CycloneDX SBOM
+        run: |
+          ./scripts/generate-sbom.sh before
+          ./scripts/generate-sbom.sh after
+          ./scripts/generate-trivy-sbom.sh before
+          ./scripts/generate-trivy-sbom.sh after
+      - name: Audit dependencies
+        run: |
+          ./scripts/audit.sh before
+          FAIL_ON_FINDINGS=1 ./scripts/audit.sh after
+      - name: Build triage summary
+        run: |
+          python scripts/triage_report.py evidence/audit-before.json reports/triage-before.md
+          python scripts/triage_report.py evidence/audit-after.json reports/triage-after.md
+      - name: Compare results
+        run: python scripts/compare_results.py evidence/audit-before.json evidence/audit-after.json reports/before-after.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dependency-security-evidence
+          path: |
+            sbom/bom-before.json
+            sbom/bom-after.json
+            sbom/trivy-bom-before.cdx.json
+            sbom/trivy-bom-after.cdx.json
+            evidence/audit-before.json
+            evidence/audit-after.json
+            reports/triage-before.md
+            reports/triage-after.md
+            reports/before-after.md
+
