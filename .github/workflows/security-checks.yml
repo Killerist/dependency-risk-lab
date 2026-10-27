@@ -12,8 +12,8 @@ jobs:
   sbom-and-audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install analysis tools
@@ -34,7 +34,7 @@ jobs:
           python scripts/triage_report.py evidence/audit-after.json reports/triage-after.md
       - name: Compare results
         run: python scripts/compare_results.py evidence/audit-before.json evidence/audit-after.json reports/before-after.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: dependency-security-evidence
           path: |
