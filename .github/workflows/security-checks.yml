@@ -20,14 +20,14 @@ jobs:
         run: python -m pip install cyclonedx-bom pip-audit
       - name: Generate CycloneDX SBOM
         run: |
-          ./scripts/generate-sbom.sh before
-          ./scripts/generate-sbom.sh after
-          ./scripts/generate-trivy-sbom.sh before
-          ./scripts/generate-trivy-sbom.sh after
+          bash ./scripts/generate-sbom.sh before
+          bash ./scripts/generate-sbom.sh after
+          bash ./scripts/generate-trivy-sbom.sh before
+          bash ./scripts/generate-trivy-sbom.sh after
       - name: Audit dependencies
         run: |
-          ./scripts/audit.sh before
-          FAIL_ON_FINDINGS=1 ./scripts/audit.sh after
+          bash ./scripts/audit.sh before
+          FAIL_ON_FINDINGS=1 bash ./scripts/audit.sh after
       - name: Build triage summary
         run: |
           python scripts/triage_report.py evidence/audit-before.json reports/triage-before.md
